@@ -1,1 +1,635 @@
+Project: Investigate a Dataset - [FBI Gun Dataset ]
+Table of Contents
+Introduction
+Data Wrangling
+Exploratory Data Analysis
+Conclusions
 
+Introduction
+Dataset Description
+The data comes from the FBI's National Instant Criminal Background Check System. The NICS is used by to determine whether a prospective buyer is eligible to buy firearms or explosives. Gun shops call into this system to ensure that each customer does not have a criminal record or isn’t otherwise ineligible to make a purchase. The data has been supplemented with state level data from census.gov.
+
+NICS data are found in .csv file
+
+USA Gun census data are found in .xlsx file
+
+Question(s) for Analysis
+Question 1: Highest rate of gun purchases by Female persons, percent, July 1, 2016?
+
+Question 2: Which states have had the highest growth in gun registrations?
+
+Question 3: What is the overall trend of gun purchases?Research
+
+Question 4: Which state has more access to gun with consideration of races?
+
+#importing handful libraries
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+from pandas.plotting import scatter_matrix
+%matplotlib inline
+# Upgrade pandas to use dataframe.explode() function. 
+!pip install --upgrade pandas==0.25.0
+Collecting pandas==0.25.0
+  Downloading https://files.pythonhosted.org/packages/1d/9a/7eb9952f4b4d73fbd75ad1d5d6112f407e695957444cb695cbb3cdab918a/pandas-0.25.0-cp36-cp36m-manylinux1_x86_64.whl (10.5MB)
+    100% |████████████████████████████████| 10.5MB 3.2MB/s eta 0:00:01  7% |██▌                             | 819kB 20.8MB/s eta 0:00:01    15% |█████                           | 1.6MB 18.0MB/s eta 0:00:01    45% |██████████████▋                 | 4.8MB 22.2MB/s eta 0:00:01    76% |████████████████████████▍       | 8.0MB 21.8MB/s eta 0:00:01    97% |███████████████████████████████ | 10.1MB 24.2MB/s eta 0:00:01
+Collecting numpy>=1.13.3 (from pandas==0.25.0)
+  Downloading https://files.pythonhosted.org/packages/45/b2/6c7545bb7a38754d63048c7696804a0d947328125d81bf12beaa692c3ae3/numpy-1.19.5-cp36-cp36m-manylinux1_x86_64.whl (13.4MB)
+    100% |████████████████████████████████| 13.4MB 1.9MB/s eta 0:00:01  9% |███                             | 1.3MB 20.4MB/s eta 0:00:01    25% |████████                        | 3.4MB 23.5MB/s eta 0:00:01    33% |██████████▋                     | 4.4MB 21.1MB/s eta 0:00:01    54% |█████████████████▌              | 7.3MB 15.5MB/s eta 0:00:01    60% |███████████████████▏            | 8.0MB 14.5MB/s eta 0:00:01    66% |█████████████████████▍          | 9.0MB 20.5MB/s eta 0:00:01    73% |███████████████████████▋        | 9.9MB 18.3MB/s eta 0:00:01    80% |█████████████████████████▉      | 10.8MB 20.9MB/s eta 0:00:01
+Requirement already satisfied, skipping upgrade: python-dateutil>=2.6.1 in /opt/conda/lib/python3.6/site-packages (from pandas==0.25.0) (2.6.1)
+Requirement already satisfied, skipping upgrade: pytz>=2017.2 in /opt/conda/lib/python3.6/site-packages (from pandas==0.25.0) (2017.3)
+Requirement already satisfied, skipping upgrade: six>=1.5 in /opt/conda/lib/python3.6/site-packages (from python-dateutil>=2.6.1->pandas==0.25.0) (1.11.0)
+tensorflow 1.3.0 requires tensorflow-tensorboard<0.2.0,>=0.1.0, which is not installed.
+Installing collected packages: numpy, pandas
+  Found existing installation: numpy 1.12.1
+    Uninstalling numpy-1.12.1:
+      Successfully uninstalled numpy-1.12.1
+  Found existing installation: pandas 0.23.3
+    Uninstalling pandas-0.23.3:
+      Successfully uninstalled pandas-0.23.3
+Successfully installed numpy-1.19.5 pandas-0.25.0
+
+Data Wrangling
+In this section of the report,the data will be loaded, check for cleanliness, and then trim and clean the dataset for analysis.
+
+# Load your data and print out a few lines. Perform operations to inspect data
+#   types and look for instances of missing or possibly errant data.
+df_cen = pd.read_csv('Database_Ncis_and_Census_data/US_Census_Data.csv')
+df_gun = pd.read_excel('Database_Ncis_and_Census_data/gun_data.xlsx')
+Next will be exploring the data to fetch any inconsistent data for the census data file
+df_cen.info()
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 85 entries, 0 to 84
+Data columns (total 52 columns):
+Fact              80 non-null object
+Fact Note         28 non-null object
+Alabama           65 non-null object
+Alaska            65 non-null object
+Arizona           65 non-null object
+Arkansas          65 non-null object
+California        65 non-null object
+Colorado          65 non-null object
+Connecticut       65 non-null object
+Delaware          65 non-null object
+Florida           65 non-null object
+Georgia           65 non-null object
+Hawaii            65 non-null object
+Idaho             65 non-null object
+Illinois          65 non-null object
+Indiana           65 non-null object
+Iowa              65 non-null object
+Kansas            65 non-null object
+Kentucky          65 non-null object
+Louisiana         65 non-null object
+Maine             65 non-null object
+Maryland          65 non-null object
+Massachusetts     65 non-null object
+Michigan          65 non-null object
+Minnesota         65 non-null object
+Mississippi       65 non-null object
+Missouri          65 non-null object
+Montana           65 non-null object
+Nebraska          65 non-null object
+Nevada            65 non-null object
+New Hampshire     65 non-null object
+New Jersey        65 non-null object
+New Mexico        65 non-null object
+New York          65 non-null object
+North Carolina    65 non-null object
+North Dakota      65 non-null object
+Ohio              65 non-null object
+Oklahoma          65 non-null object
+Oregon            65 non-null object
+Pennsylvania      65 non-null object
+Rhode Island      65 non-null object
+South Carolina    65 non-null object
+South Dakota      65 non-null object
+Tennessee         65 non-null object
+Texas             65 non-null object
+Utah              65 non-null object
+Vermont           65 non-null object
+Virginia          65 non-null object
+Washington        65 non-null object
+West Virginia     65 non-null object
+Wisconsin         65 non-null object
+Wyoming           65 non-null object
+dtypes: object(52)
+memory usage: 34.6+ KB
+#the data contains null values, we will continue investigation
+df_cen.isnull().sum()
+Fact               5
+Fact Note         57
+Alabama           20
+Alaska            20
+Arizona           20
+Arkansas          20
+California        20
+Colorado          20
+Connecticut       20
+Delaware          20
+Florida           20
+Georgia           20
+Hawaii            20
+Idaho             20
+Illinois          20
+Indiana           20
+Iowa              20
+Kansas            20
+Kentucky          20
+Louisiana         20
+Maine             20
+Maryland          20
+Massachusetts     20
+Michigan          20
+Minnesota         20
+Mississippi       20
+Missouri          20
+Montana           20
+Nebraska          20
+Nevada            20
+New Hampshire     20
+New Jersey        20
+New Mexico        20
+New York          20
+North Carolina    20
+North Dakota      20
+Ohio              20
+Oklahoma          20
+Oregon            20
+Pennsylvania      20
+Rhode Island      20
+South Carolina    20
+South Dakota      20
+Tennessee         20
+Texas             20
+Utah              20
+Vermont           20
+Virginia          20
+Washington        20
+West Virginia     20
+Wisconsin         20
+Wyoming           20
+dtype: int64
+#check if we have duplicated rows 
+df_cen.duplicated().sum()
+3
+#summary statistics on the data
+df_cen.describe()
+Fact	Fact Note	Alabama	Alaska	Arizona	Arkansas	California	Colorado	Connecticut	Delaware	...	South Dakota	Tennessee	Texas	Utah	Vermont	Virginia	Washington	West Virginia	Wisconsin	Wyoming
+count	80	28	65	65	65	65	65	65	65	65	...	65	65	65	65	65	65	65	65	65	65
+unique	80	15	65	64	64	64	63	64	63	64	...	65	64	64	64	63	65	65	64	65	64
+top	Persons 65 years and over, percent, July 1, 2...	(c)	2,230,185	7.30%	50.30%	50.90%	50.30%	3.30%	0.10%	51.60%	...	13812997	0.048	50.40%	2.50%	625,741	64.70%	2.90%	1.50%	54,157.80	7.10%
+freq	1	6	1	2	2	2	2	2	2	2	...	1	2	2	2	2	1	1	2	1	2
+4 rows × 52 columns
+
+Next will be exploring the data to fetch any inconsistent data for the gun data file
+df_gun.info()
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 12485 entries, 0 to 12484
+Data columns (total 27 columns):
+month                        12485 non-null object
+state                        12485 non-null object
+permit                       12461 non-null float64
+permit_recheck               1100 non-null float64
+handgun                      12465 non-null float64
+long_gun                     12466 non-null float64
+other                        5500 non-null float64
+multiple                     12485 non-null int64
+admin                        12462 non-null float64
+prepawn_handgun              10542 non-null float64
+prepawn_long_gun             10540 non-null float64
+prepawn_other                5115 non-null float64
+redemption_handgun           10545 non-null float64
+redemption_long_gun          10544 non-null float64
+redemption_other             5115 non-null float64
+returned_handgun             2200 non-null float64
+returned_long_gun            2145 non-null float64
+returned_other               1815 non-null float64
+rentals_handgun              990 non-null float64
+rentals_long_gun             825 non-null float64
+private_sale_handgun         2750 non-null float64
+private_sale_long_gun        2750 non-null float64
+private_sale_other           2750 non-null float64
+return_to_seller_handgun     2475 non-null float64
+return_to_seller_long_gun    2750 non-null float64
+return_to_seller_other       2255 non-null float64
+totals                       12485 non-null int64
+dtypes: float64(23), int64(2), object(2)
+memory usage: 2.6+ MB
+#the data contains null values, we will continue investigation
+df_gun.isnull().sum()
+month                            0
+state                            0
+permit                          24
+permit_recheck               11385
+handgun                         20
+long_gun                        19
+other                         6985
+multiple                         0
+admin                           23
+prepawn_handgun               1943
+prepawn_long_gun              1945
+prepawn_other                 7370
+redemption_handgun            1940
+redemption_long_gun           1941
+redemption_other              7370
+returned_handgun             10285
+returned_long_gun            10340
+returned_other               10670
+rentals_handgun              11495
+rentals_long_gun             11660
+private_sale_handgun          9735
+private_sale_long_gun         9735
+private_sale_other            9735
+return_to_seller_handgun     10010
+return_to_seller_long_gun     9735
+return_to_seller_other       10230
+totals                           0
+dtype: int64
+#checking for duplicates rows
+df_gun.duplicated().sum()
+0
+#summary statistics 
+df_gun.describe()
+permit	permit_recheck	handgun	long_gun	other	multiple	admin	prepawn_handgun	prepawn_long_gun	prepawn_other	...	returned_other	rentals_handgun	rentals_long_gun	private_sale_handgun	private_sale_long_gun	private_sale_other	return_to_seller_handgun	return_to_seller_long_gun	return_to_seller_other	totals
+count	12461.000000	1100.000000	12465.000000	12466.000000	5500.000000	12485.000000	12462.000000	10542.000000	10540.000000	5115.000000	...	1815.000000	990.000000	825.000000	2750.000000	2750.000000	2750.000000	2475.000000	2750.000000	2255.000000	12485.000000
+mean	6413.629404	1165.956364	5940.881107	7810.847585	360.471636	268.603364	58.898090	4.828021	7.834156	0.165591	...	1.027548	0.076768	0.087273	14.936000	11.602909	1.030182	0.402020	0.441818	0.105987	21595.725911
+std	23752.338269	9224.200609	8618.584060	9309.846140	1349.478273	783.185073	604.814818	10.907756	16.468028	1.057105	...	4.386296	0.634503	0.671649	71.216021	54.253090	4.467843	1.446568	1.528223	0.427363	32591.418387
+min	0.000000	0.000000	0.000000	0.000000	0.000000	0.000000	0.000000	0.000000	0.000000	0.000000	...	0.000000	0.000000	0.000000	0.000000	0.000000	0.000000	0.000000	0.000000	0.000000	0.000000
+25%	0.000000	0.000000	865.000000	2078.250000	17.000000	15.000000	0.000000	0.000000	0.000000	0.000000	...	0.000000	0.000000	0.000000	0.000000	0.000000	0.000000	0.000000	0.000000	0.000000	4638.000000
+50%	518.000000	0.000000	3059.000000	5122.000000	121.000000	125.000000	0.000000	0.000000	1.000000	0.000000	...	0.000000	0.000000	0.000000	0.000000	0.000000	0.000000	0.000000	0.000000	0.000000	12399.000000
+75%	4272.000000	0.000000	7280.000000	10380.750000	354.000000	301.000000	0.000000	5.000000	8.000000	0.000000	...	0.000000	0.000000	0.000000	2.000000	4.000000	0.000000	0.000000	0.000000	0.000000	25453.000000
+max	522188.000000	116681.000000	107224.000000	108058.000000	77929.000000	38907.000000	28083.000000	164.000000	269.000000	49.000000	...	64.000000	12.000000	12.000000	1017.000000	777.000000	71.000000	28.000000	17.000000	4.000000	541978.000000
+8 rows × 25 columns
+
+Data Cleaning
+In later investigation, Null values, missing data, incompatible datatypes and duplicated rows are found. For that in the next phase we will be cleaning the data to be ready for further analysis.
+
+Seems from census summary data that all columns -except for the first two columns- have string datatypes, that needs to be changed to float to be able to do descriptive stat functions on them and fill null values with their average values.
+#fixing data types (starting from 2nd column) to be float
+col = df_cen.iloc[:, 2:].columns
+for c in col:
+    df_cen[c] = df_cen[c].str.extract('(\d+)').astype(float)
+#check for datatypes in census
+df_cen.info()
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 85 entries, 0 to 84
+Data columns (total 52 columns):
+Fact              80 non-null object
+Fact Note         28 non-null object
+Alabama           65 non-null float64
+Alaska            64 non-null float64
+Arizona           65 non-null float64
+Arkansas          65 non-null float64
+California        65 non-null float64
+Colorado          65 non-null float64
+Connecticut       65 non-null float64
+Delaware          65 non-null float64
+Florida           65 non-null float64
+Georgia           65 non-null float64
+Hawaii            64 non-null float64
+Idaho             65 non-null float64
+Illinois          65 non-null float64
+Indiana           65 non-null float64
+Iowa              65 non-null float64
+Kansas            65 non-null float64
+Kentucky          65 non-null float64
+Louisiana         65 non-null float64
+Maine             64 non-null float64
+Maryland          65 non-null float64
+Massachusetts     65 non-null float64
+Michigan          64 non-null float64
+Minnesota         65 non-null float64
+Mississippi       65 non-null float64
+Missouri          65 non-null float64
+Montana           65 non-null float64
+Nebraska          65 non-null float64
+Nevada            65 non-null float64
+New Hampshire     65 non-null float64
+New Jersey        65 non-null float64
+New Mexico        65 non-null float64
+New York          65 non-null float64
+North Carolina    65 non-null float64
+North Dakota      65 non-null float64
+Ohio              65 non-null float64
+Oklahoma          65 non-null float64
+Oregon            65 non-null float64
+Pennsylvania      65 non-null float64
+Rhode Island      65 non-null float64
+South Carolina    65 non-null float64
+South Dakota      65 non-null float64
+Tennessee         65 non-null float64
+Texas             65 non-null float64
+Utah              65 non-null float64
+Vermont           64 non-null float64
+Virginia          65 non-null float64
+Washington        65 non-null float64
+West Virginia     64 non-null float64
+Wisconsin         65 non-null float64
+Wyoming           64 non-null float64
+dtypes: float64(50), object(2)
+memory usage: 34.6+ KB
+#now dropping duplicated data in census file
+df_cen.drop_duplicates(inplace = True)
+#then check if still exist duplicates
+df_cen.duplicated().sum()
+0
+# replace spaces with underscores and lowercase labels for census data
+df_cen.rename(columns=lambda x: x.strip().lower().replace(" ", "_"), inplace=True)
+df_cen.head(5)
+fact	fact_note	alabama	alaska	arizona	arkansas	california	colorado	connecticut	delaware	...	south_dakota	tennessee	texas	utah	vermont	virginia	washington	west_virginia	wisconsin	wyoming
+0	Population estimates, July 1, 2016, (V2016)	NaN	4.0	741.0	6.0	2.0	39.0	5.0	3.0	952.0	...	865454.0	6651194.0	27.0	3.0	624.0	8.0	7.0	1.0	5.0	585.0
+1	Population estimates base, April 1, 2010, (V2...	NaN	4.0	710.0	6.0	2.0	37.0	5.0	3.0	897.0	...	814195.0	6346298.0	25.0	2.0	625.0	8.0	6.0	1.0	5.0	563.0
+2	Population, percent change - April 1, 2010 (es...	NaN	1.0	4.0	8.0	2.0	5.0	10.0	0.0	6.0	...	0.0	0.0	10.0	10.0	0.0	5.0	8.0	1.0	1.0	3.0
+3	Population, Census, April 1, 2010	NaN	4.0	710.0	6.0	2.0	37.0	5.0	3.0	897.0	...	814180.0	6346105.0	25.0	2.0	625.0	8.0	6.0	1.0	5.0	563.0
+4	Persons under 5 years, percent, July 1, 2016, ...	NaN	6.0	7.0	6.0	6.0	6.0	6.0	5.0	5.0	...	0.0	0.0	7.0	8.0	4.0	6.0	6.0	5.0	5.0	6.0
+5 rows × 52 columns
+
+#dealing with null values in census where they are present as string in the fisrt two columns 
+df_cen['fact'].fillna('No Data', inplace = True)
+df_cen['fact_note'].fillna('No Data', inplace = True)
+#check null values in fisrt two clomuns 
+df_cen.head(5)
+fact	fact_note	alabama	alaska	arizona	arkansas	california	colorado	connecticut	delaware	...	south_dakota	tennessee	texas	utah	vermont	virginia	washington	west_virginia	wisconsin	wyoming
+0	Population estimates, July 1, 2016, (V2016)	No Data	4.0	741.0	6.0	2.0	39.0	5.0	3.0	952.0	...	865454.0	6651194.0	27.0	3.0	624.0	8.0	7.0	1.0	5.0	585.0
+1	Population estimates base, April 1, 2010, (V2...	No Data	4.0	710.0	6.0	2.0	37.0	5.0	3.0	897.0	...	814195.0	6346298.0	25.0	2.0	625.0	8.0	6.0	1.0	5.0	563.0
+2	Population, percent change - April 1, 2010 (es...	No Data	1.0	4.0	8.0	2.0	5.0	10.0	0.0	6.0	...	0.0	0.0	10.0	10.0	0.0	5.0	8.0	1.0	1.0	3.0
+3	Population, Census, April 1, 2010	No Data	4.0	710.0	6.0	2.0	37.0	5.0	3.0	897.0	...	814180.0	6346105.0	25.0	2.0	625.0	8.0	6.0	1.0	5.0	563.0
+4	Persons under 5 years, percent, July 1, 2016, ...	No Data	6.0	7.0	6.0	6.0	6.0	6.0	5.0	5.0	...	0.0	0.0	7.0	8.0	4.0	6.0	6.0	5.0	5.0	6.0
+5 rows × 52 columns
+
+#now dealing with the rest of the numerical null values in census, we will replace them with the mean
+col_1 = df_cen.iloc[:, 2:].columns
+for c in col_1:
+    df_cen[c].fillna(df_cen[c].mean(), inplace = True)
+
+#check for cleaned version of null values
+df_cen.isnull().sum()
+fact              0
+fact_note         0
+alabama           0
+alaska            0
+arizona           0
+arkansas          0
+california        0
+colorado          0
+connecticut       0
+delaware          0
+florida           0
+georgia           0
+hawaii            0
+idaho             0
+illinois          0
+indiana           0
+iowa              0
+kansas            0
+kentucky          0
+louisiana         0
+maine             0
+maryland          0
+massachusetts     0
+michigan          0
+minnesota         0
+mississippi       0
+missouri          0
+montana           0
+nebraska          0
+nevada            0
+new_hampshire     0
+new_jersey        0
+new_mexico        0
+new_york          0
+north_carolina    0
+north_dakota      0
+ohio              0
+oklahoma          0
+oregon            0
+pennsylvania      0
+rhode_island      0
+south_carolina    0
+south_dakota      0
+tennessee         0
+texas             0
+utah              0
+vermont           0
+virginia          0
+washington        0
+west_virginia     0
+wisconsin         0
+wyoming           0
+dtype: int64
+Moving to gun data file, in first two columns we have numerical values that have string as data type, we will change that. For the rest of the columns containing null values that need to be dealt with.
+# first I noticed that month column have string as datatype, it needs to be in datetime format
+df_gun['month'] = pd.to_datetime(df_gun['month'])
+#check if datatype has changed
+df_gun.info()
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 12485 entries, 0 to 12484
+Data columns (total 27 columns):
+month                        12485 non-null datetime64[ns]
+state                        12485 non-null object
+permit                       12461 non-null float64
+permit_recheck               1100 non-null float64
+handgun                      12465 non-null float64
+long_gun                     12466 non-null float64
+other                        5500 non-null float64
+multiple                     12485 non-null int64
+admin                        12462 non-null float64
+prepawn_handgun              10542 non-null float64
+prepawn_long_gun             10540 non-null float64
+prepawn_other                5115 non-null float64
+redemption_handgun           10545 non-null float64
+redemption_long_gun          10544 non-null float64
+redemption_other             5115 non-null float64
+returned_handgun             2200 non-null float64
+returned_long_gun            2145 non-null float64
+returned_other               1815 non-null float64
+rentals_handgun              990 non-null float64
+rentals_long_gun             825 non-null float64
+private_sale_handgun         2750 non-null float64
+private_sale_long_gun        2750 non-null float64
+private_sale_other           2750 non-null float64
+return_to_seller_handgun     2475 non-null float64
+return_to_seller_long_gun    2750 non-null float64
+return_to_seller_other       2255 non-null float64
+totals                       12485 non-null int64
+dtypes: datetime64[ns](1), float64(23), int64(2), object(1)
+memory usage: 2.6+ MB
+#Since there's no null values in first two columns
+#starting from 3rd cloumn to replace null values with their means
+
+col_g = df_gun.iloc[:, 2:].columns
+for c in col_g:
+    df_gun[c].fillna(df_gun[c].mean(), inplace = True)
+
+  #check for null values in gun data file
+df_gun.isnull().sum()  
+month                        0
+state                        0
+permit                       0
+permit_recheck               0
+handgun                      0
+long_gun                     0
+other                        0
+multiple                     0
+admin                        0
+prepawn_handgun              0
+prepawn_long_gun             0
+prepawn_other                0
+redemption_handgun           0
+redemption_long_gun          0
+redemption_other             0
+returned_handgun             0
+returned_long_gun            0
+returned_other               0
+rentals_handgun              0
+rentals_long_gun             0
+private_sale_handgun         0
+private_sale_long_gun        0
+private_sale_other           0
+return_to_seller_handgun     0
+return_to_seller_long_gun    0
+return_to_seller_other       0
+totals                       0
+dtype: int64
+
+Exploratory Data Analysis
+Exploring data using numerical, statistical and visualising the data
+
+Visualisation our data helps detecting relations between variables, next we will be exploring data visually
+#visualising gun data  
+pd.plotting.scatter_matrix(df_gun, figsize = (15, 15));
+plt.title('Gun data distribution')
+Text(0.5,1,'Gun data distribution')
+
+#plotting relation between state and access permitions to guns
+x = df_gun['permit']
+y = df_gun['state']
+plt.plot(x, y)
+plt.title('states with gun permits')
+plt.xlabel('permitions')
+plt.ylabel('state')
+plt.show();
+
+#a bar chart visualisation of categorised data of people in census data file
+df_cen['fact'].value_counts().plot.bar(title='Gender, Age, Race, Social states',figsize= (15 ,5) );
+
+#plotting correlation between long gun type and its access permissions
+df_gun.plot(x= 'permit', y= 'long_gun', kind = 'scatter', title='long gun type relation with its permits', figsize=(10,10));
+
+Research Question 1: Highest rate of gun purchases by Female persons, percent, July 1, 2016?
+#fetching max value of purchases by selecting rows and colums to female purchasing guns 
+df_cen.iloc[11, 2:].idxmax
+<bound method Series.idxmax of alabama           51
+alaska            48
+arizona           50
+arkansas          50
+california        50
+colorado          49
+connecticut       51
+delaware          51
+florida           51
+georgia           51
+hawaii            49
+idaho             49
+illinois          51
+indiana           50
+iowa              50
+kansas            50
+kentucky          50
+louisiana         51
+maine             51
+maryland          51
+massachusetts     51
+michigan          50
+minnesota         50
+mississippi       51
+missouri          51
+montana           49
+nebraska          50
+nevada            49
+new_hampshire     50
+new_jersey        51
+new_mexico         0
+new_york           0
+north_carolina     0
+north_dakota       0
+ohio               0
+oklahoma           0
+oregon             0
+pennsylvania       0
+rhode_island       0
+south_carolina     0
+south_dakota       0
+tennessee          0
+texas             50
+utah              49
+vermont           50
+virginia          50
+washington        50
+west_virginia     50
+wisconsin         50
+wyoming           49
+Name: 11, dtype: object>
+connecticut, delaware, florida, georgia, louisiana, maine, maryland, massachusetts, mississippi, missouri and new_jersey had the highest female purchases
+
+Research Question 2: Which states have had the highest growth in gun registrations?
+#selecting specfic columns to make analysis  
+result_growth = df_gun.groupby(['month', 'state'])['totals'].sum()
+#returning max value of states gun registrations
+result_growth.idxmax()
+(Timestamp('2014-03-01 00:00:00'), 'North Carolina')
+# visualising how North Carolina is the highest in registrations
+plt.xlabel("North Carolina State")
+plt.title('registrations growth in states')
+result_growth.plot( kind = 'hist', color ='brown');
+
+North Carolina have had the highest gun registrations growth with nearly 11,000 < guns over the years.
+
+Research Question 3: What is the overall trend of gun purchases?
+#plotting visually the trend of gun purchases
+plt.figure(figsize=(8,5))
+gun_purchaces = df_gun.groupby('month')['totals'].sum()
+ax = sns.tsplot(data=gun_purchaces, err_style="unit_traces");
+
+plt.title('gun trend')
+plt.xlabel('time')
+plt.ylabel('Frequency')
+plt.legend();
+/opt/conda/lib/python3.6/site-packages/seaborn/timeseries.py:183: UserWarning: The tsplot function is deprecated and will be removed or replaced (in a substantially altered version) in a future release.
+  warnings.warn(msg, UserWarning)
+
+Seems that overall trend is positive (increasing) over the years
+
+Research Question 4: Which state has more access to gun with consideration of races?
+#plotting visually people of different backgrounds to its gun purchases
+df_cen.groupby(['fact']).sum().plot(kind='hist', figsize=(10,10));
+plt.title('access to guns')
+plt.xlabel('states')
+plt.ylabel('Frequency')
+plt.legend();
+
+georgia, maryland, new jersey, south carolina and wyoming are the states with higher access rates across all races and ages
+
+
+Conclusions
+Across the 50 states of America, Females seems to have access to guns from different ages and racial backgrouds, the following states have the highest rates of female purchases: connecticut, delaware, florida, georgia, louisiana, maine, maryland, massachusetts, mississippi, missouri and new_jersey.
+
+North Carolina have had the highest gun registrations growth with nearly 11,000 < guns over the years.
+
+It seems that going forward through years, we find higher rates of guns purchases making it a positive trend.
+
+Limitations
+1-Null values
+
+2-missing data
+
+3-incompatible datatypes
+
+4-duplicated rows are found. We cleaned the data to be ready for further analysis.
+
+from subprocess import call
+call(['python', '-m', 'nbconvert', 'Investigate_a_Dataset.ipynb'])
+0
+ 
