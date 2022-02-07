@@ -1,0 +1,253 @@
+Dataset Exploration of Ford Go-Bike
+by Salma Youssef
+Preliminary Wrangling
+This data set includes information about individual rides made in a bike-sharing system covering the greater San Francisco Bay area.
+
+# import all packages and set plots to be embedded inline
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sb
+
+%matplotlib inline
+Load in your dataset and describe its properties through the questions below. Try and motivate your exploration goals through this section.
+
+df = pd.read_csv('201902-fordgobike-tripdata.csv')
+print(df.shape)
+print(df.dtypes)
+print(df.head(10))
+(183412, 16)
+duration_sec                 int64
+start_time                  object
+end_time                    object
+start_station_id           float64
+start_station_name          object
+start_station_latitude     float64
+start_station_longitude    float64
+end_station_id             float64
+end_station_name            object
+end_station_latitude       float64
+end_station_longitude      float64
+bike_id                      int64
+user_type                   object
+member_birth_year          float64
+member_gender               object
+bike_share_for_all_trip     object
+dtype: object
+   duration_sec                start_time                  end_time  \
+0         52185  2019-02-28 17:32:10.1450  2019-03-01 08:01:55.9750   
+1         42521  2019-02-28 18:53:21.7890  2019-03-01 06:42:03.0560   
+2         61854  2019-02-28 12:13:13.2180  2019-03-01 05:24:08.1460   
+3         36490  2019-02-28 17:54:26.0100  2019-03-01 04:02:36.8420   
+4          1585  2019-02-28 23:54:18.5490  2019-03-01 00:20:44.0740   
+5          1793  2019-02-28 23:49:58.6320  2019-03-01 00:19:51.7600   
+6          1147  2019-02-28 23:55:35.1040  2019-03-01 00:14:42.5880   
+7          1615  2019-02-28 23:41:06.7660  2019-03-01 00:08:02.7560   
+8          1570  2019-02-28 23:41:48.7900  2019-03-01 00:07:59.7150   
+9          1049  2019-02-28 23:49:47.6990  2019-03-01 00:07:17.0250   
+
+   start_station_id                                start_station_name  \
+0              21.0  Montgomery St BART Station (Market St at 2nd St)   
+1              23.0                     The Embarcadero at Steuart St   
+2              86.0                           Market St at Dolores St   
+3             375.0                           Grove St at Masonic Ave   
+4               7.0                               Frank H Ogawa Plaza   
+5              93.0                      4th St at Mission Bay Blvd S   
+6             300.0                              Palm St at Willow St   
+7              10.0                        Washington St at Kearny St   
+8              10.0                        Washington St at Kearny St   
+9              19.0                              Post St at Kearny St   
+
+   start_station_latitude  start_station_longitude  end_station_id  \
+0               37.789625              -122.400811            13.0   
+1               37.791464              -122.391034            81.0   
+2               37.769305              -122.426826             3.0   
+3               37.774836              -122.446546            70.0   
+4               37.804562              -122.271738           222.0   
+5               37.770407              -122.391198           323.0   
+6               37.317298              -121.884995           312.0   
+7               37.795393              -122.404770           127.0   
+8               37.795393              -122.404770           127.0   
+9               37.788975              -122.403452           121.0   
+
+                               end_station_name  end_station_latitude  \
+0                Commercial St at Montgomery St             37.794231   
+1                            Berry St at 4th St             37.775880   
+2  Powell St BART Station (Market St at 4th St)             37.786375   
+3                        Central Ave at Fell St             37.773311   
+4                         10th Ave at E 15th St             37.792714   
+5                            Broadway at Kearny             37.798014   
+6                      San Jose Diridon Station             37.329732   
+7                        Valencia St at 21st St             37.756708   
+8                        Valencia St at 21st St             37.756708   
+9                            Mission Playground             37.759210   
+
+   end_station_longitude  bike_id   user_type  member_birth_year  \
+0            -122.402923     4902    Customer             1984.0   
+1            -122.393170     2535    Customer                NaN   
+2            -122.404904     5905    Customer             1972.0   
+3            -122.444293     6638  Subscriber             1989.0   
+4            -122.248780     4898  Subscriber             1974.0   
+5            -122.405950     5200  Subscriber             1959.0   
+6            -121.901782     3803  Subscriber             1983.0   
+7            -122.421025     6329  Subscriber             1989.0   
+8            -122.421025     6548  Subscriber             1988.0   
+9            -122.421339     6488  Subscriber             1992.0   
+
+  member_gender bike_share_for_all_trip  
+0          Male                      No  
+1           NaN                      No  
+2          Male                      No  
+3         Other                      No  
+4          Male                     Yes  
+5          Male                      No  
+6        Female                      No  
+7          Male                      No  
+8         Other                      No  
+9          Male                      No  
+df.describe()
+duration_sec	start_station_id	start_station_latitude	start_station_longitude	end_station_id	end_station_latitude	end_station_longitude	bike_id	member_birth_year
+count	183412.000000	183215.000000	183412.000000	183412.000000	183215.000000	183412.000000	183412.000000	183412.000000	175147.000000
+mean	726.078435	138.590427	37.771223	-122.352664	136.249123	37.771427	-122.352250	4472.906375	1984.806437
+std	1794.389780	111.778864	0.099581	0.117097	111.515131	0.099490	0.116673	1664.383394	10.116689
+min	61.000000	3.000000	37.317298	-122.453704	3.000000	37.317298	-122.453704	11.000000	1878.000000
+25%	325.000000	47.000000	37.770083	-122.412408	44.000000	37.770407	-122.411726	3777.000000	1980.000000
+50%	514.000000	104.000000	37.780760	-122.398285	100.000000	37.781010	-122.398279	4958.000000	1987.000000
+75%	796.000000	239.000000	37.797280	-122.286533	235.000000	37.797320	-122.288045	5502.000000	1992.000000
+max	85444.000000	398.000000	37.880222	-121.874119	398.000000	37.880222	-121.874119	6645.000000	2001.000000
+df.info()
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 183412 entries, 0 to 183411
+Data columns (total 16 columns):
+duration_sec               183412 non-null int64
+start_time                 183412 non-null object
+end_time                   183412 non-null object
+start_station_id           183215 non-null float64
+start_station_name         183215 non-null object
+start_station_latitude     183412 non-null float64
+start_station_longitude    183412 non-null float64
+end_station_id             183215 non-null float64
+end_station_name           183215 non-null object
+end_station_latitude       183412 non-null float64
+end_station_longitude      183412 non-null float64
+bike_id                    183412 non-null int64
+user_type                  183412 non-null object
+member_birth_year          175147 non-null float64
+member_gender              175147 non-null object
+bike_share_for_all_trip    183412 non-null object
+dtypes: float64(7), int64(2), object(7)
+memory usage: 22.4+ MB
+We discovered null values, wrong data types and some unwanted columns that will all be cleaned in next steps
+
+#dropping unwanted columns 
+df.drop(['start_station_latitude', 'start_station_longitude', 'end_station_latitude', 'end_station_longitude'], axis=1, inplace = True)
+#check for dropped columns
+df.info()
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 183412 entries, 0 to 183411
+Data columns (total 12 columns):
+duration_sec               183412 non-null int64
+start_time                 183412 non-null object
+end_time                   183412 non-null object
+start_station_id           183215 non-null float64
+start_station_name         183215 non-null object
+end_station_id             183215 non-null float64
+end_station_name           183215 non-null object
+bike_id                    183412 non-null int64
+user_type                  183412 non-null object
+member_birth_year          175147 non-null float64
+member_gender              175147 non-null object
+bike_share_for_all_trip    183412 non-null object
+dtypes: float64(3), int64(2), object(7)
+memory usage: 16.8+ MB
+#fixing wrong datatype of start_time and end_time to be datetime
+df[['start_time','end_time']] = df[['start_time','end_time']].apply(pd.to_datetime)
+#fixing more columns datatypes
+df[['start_station_id','end_station_id',]] = df[['start_station_id','end_station_id',]].astype(str)
+df.info()
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 183412 entries, 0 to 183411
+Data columns (total 12 columns):
+duration_sec               183412 non-null int64
+start_time                 183412 non-null datetime64[ns]
+end_time                   183412 non-null datetime64[ns]
+start_station_id           183412 non-null object
+start_station_name         183215 non-null object
+end_station_id             183412 non-null object
+end_station_name           183215 non-null object
+bike_id                    183412 non-null int64
+user_type                  183412 non-null object
+member_birth_year          175147 non-null float64
+member_gender              175147 non-null object
+bike_share_for_all_trip    183412 non-null object
+dtypes: datetime64[ns](2), float64(1), int64(2), object(7)
+memory usage: 16.8+ MB
+What is the structure of your dataset?
+183412 rows, 12 columns holding information of each person's bike trip data. their trip duration, bike id, gender and some more attributes
+
+What is/are the main feature(s) of interest in your dataset?
+whether gender can affect participation in bike activities
+
+What features in the dataset do you think will help support your investigation into your feature(s) of interest?
+user type and its gender
+
+Univariate Exploration
+#average time in a trip
+binsize = 500
+bins = np.arange(0, df['duration_sec'].max()+binsize, binsize)
+plt.figure(figsize=[14, 8])
+
+plt.hist(data = df, x = 'duration_sec');
+plt.title('trip duration in seconds')
+plt.xlabel('duration in seconds')
+plt.ylabel('frequency of trips');
+
+most trips take < 20000 sec
+
+plt.figure(figsize=[10, 8])
+gender = df['member_gender'].value_counts().index
+sb.countplot(data = df, x='member_gender', color = sb.color_palette()[0], order = gender)
+
+plt.title('bike trips relative to gneder')
+plt.xlabel('gender')
+plt.ylabel('frequency of trips');
+
+Males use more bikes
+
+Discuss the distribution(s) of your variable(s) of interest. Were there any unusual points? Did you need to perform any transformations?
+yes i did clean some data in the process
+
+Of the features you investigated, were there any unusual distributions? Did you perform any operations on the data to tidy, adjust, or change the form of the data? If so, why did you do this?
+i dropped unwanted columns, changed datatypes of some attributes, to make analysis more smooth
+
+Bivariate Exploration
+#gender and trip duration 
+plt.figure(figsize = [10, 8])
+sb.violinplot(data = df, x = 'member_gender', y = 'duration_sec', color = sb.color_palette()[0])
+plt.title('trip duaration relative to gender')
+plt.xlabel('customer gender')
+plt.ylabel('trip duration');
+
+seems like duration in females and males are greater than "other"
+
+Talk about some of the relationships you observed in this part of the investigation. How did the feature(s) of interest vary with other features in the dataset?
+they don't vary as much expected
+
+Did you observe any interesting relationships between the other features (not the main feature(s) of interest)?
+no, they seem normal
+
+Multivariate Exploration
+plt.figure(figsize = [10, 8])
+sb.stripplot(data = df, x = 'member_gender', y = 'duration_sec', hue = 'user_type', jitter = 0.5, dodge = True)
+
+plt.title('gender trip duaration relative to user type')
+plt.xlabel('customer gender')
+plt.ylabel('trip duration');
+
+customers and subscribers almost have the same ratios, but with "other" subscribers are slighlty more than customers
+
+Talk about some of the relationships you observed in this part of the investigation. Were there features that strengthened each other in terms of looking at your feature(s) of interest?
+the relation between gender, their trip duration and their user types
+
+Were there any interesting or surprising interactions between features?
+yes, although in previous plots males and females seemed to have almost same values, in the above plot when we added the user type dimension, men seemed to have engaged more.
